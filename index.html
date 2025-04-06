@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cinder Spires RPG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+        /* Custom scrollbar styling for better theme integration */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; /* Dark track */ }
+        ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; /* Red thumb */ }
+        ::-webkit-scrollbar-thumb:hover { background: #b91c1c; /* Darker red on hover */ }
+
+        /* Enable smooth scrolling for anchor links */
+        html { scroll-behavior: smooth; }
+
+        /* Base body styling */
+        body {
+            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            background-color: #0a0a0a; /* Very dark background */
+            color: #e5e5e5; /* Light gray text */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        /* Subtle background texture overlay */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(30, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url('https://www.transparenttextures.com/patterns/dark-matter.png'); /* Example texture */
+            opacity: 0.3; z-index: -1; pointer-events: none; /* Ensure it's behind content and non-interactive */
+        }
+
+        /* Custom shadow effects using the red accent color */
+        .red-glow { box-shadow: 0 0 15px 5px rgba(220, 38, 38, 0.3), 0 0 5px 1px rgba(220, 38, 38, 0.2); }
+        .red-glow-light { box-shadow: 0 0 8px 2px rgba(220, 38, 38, 0.2), 0 0 3px 1px rgba(220, 38, 38, 0.1); }
+
+        /* Header styling with blur effect */
+        header {
+            background-color: rgba(10, 10, 10, 0.8); /* Semi-transparent dark background */
+            backdrop-filter: blur(10px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
+        }
+
+        /* Section heading styling */
+        h2 {
+             border-bottom: 2px solid #dc2626; /* Red underline */
+             padding-bottom: 0.5rem;
+             display: inline-block; /* Border only spans text width */
+        }
+
+        /* Card styling with hover effect */
+        .card {
+            background-color: rgba(26, 26, 26, 0.7); /* Dark semi-transparent card background */
+            border: 1px solid rgba(220, 38, 38, 0.3); /* Subtle red border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Slight lift effect */
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.2); /* Red glow effect on hover */
+        }
+
+        /* Styles for the calculator inputs and labels */
+        .calculator-input {
+            background-color: #2a2a2a; /* Darker input background */
+            border: 1px solid #444; /* Neutral border */
+            color: #e5e5e5; /* Light text */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.5rem 0.75rem; /* py-2 px-3 */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Smooth focus transition */
+            width: 100%; /* Full width within container */
+        }
+        .calculator-input:focus {
+            outline: none; /* Remove default focus outline */
+            border-color: #dc2626; /* Red border on focus */
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4); /* Red ring effect on focus */
+        }
+        .calculator-label {
+            display: block; /* Ensure label is above input */
+            margin-bottom: 0.25rem; /* mb-1 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            color: #a3a3a3; /* text-neutral-400 */
+        }
+
+        /* Calculator button styling */
+        .calculator-button {
+             background-color: #dc2626; /* bg-red-600 */
+             color: white;
+             font-weight: 600; /* font-semibold */
+             padding: 0.75rem 1.5rem; /* py-3 px-6 */
+             border-radius: 0.5rem; /* rounded-lg */
+             transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+             cursor: pointer;
+             border: none; /* Remove default button border */
+        }
+        .calculator-button:hover {
+            background-color: #b91c1c; /* hover:bg-red-700 */
+            transform: scale(1.03); /* Slight scale effect on hover */
+        }
+
+        /* Styling for the results display box */
+        .result-box {
+            background-color: rgba(10, 10, 10, 0.5); /* Dark, slightly transparent background */
+            border: 1px solid #dc2626; /* Red border */
+            padding: 1rem; /* p-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            margin-top: 1rem; /* mt-4 */
+            min-height: 100px; /* Ensure minimum height */
+        }
+         .result-box strong {
+             color: #f87171; /* text-red-400 - Highlight important numbers */
+         }
+
+         /* Styling for the disclaimer note */
+         .disclaimer {
+            font-size: 0.8rem; /* Smaller text */
+            color: #a3a3a3; /* neutral-400 */
+            border-left: 3px solid #dc2626; /* red-600 - Red accent bar */
+            padding-left: 0.75rem; /* pl-3 */
+            margin-top: 1rem; /* mt-4 */
+            font-style: italic;
+         }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 z-50 w-full shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-red-600">The Cinder Spires</h1>
+            <div class="space-x-4 md:space-x-6 text-neutral-300 text-sm md:text-base">
+                <a href="#world" class="hover:text-red-500 transition duration-300">World</a>
+                <a href="#attributes" class="hover:text-red-500 transition duration-300">Attributes</a>
+                <a href="#archetypes" class="hover:text-red-500 transition duration-300">Archetypes</a>
+                <a href="#combat-calculator" class="hover:text-red-500 transition duration-300">Combat Calc</a>
+                <a href="#airship-combat-calculator" class="hover:text-red-500 transition duration-300">Airship Calc</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="hero" class="relative text-center py-24 md:py-32 lg:py-40 min-h-[60vh] flex flex-col justify-center items-center overflow-hidden rounded-lg mb-16 bg-gradient-to-b from-neutral-900 to-black" data-aos="fade-in" data-aos-duration="1000">
+             <div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle, rgba(220,38,38,0.2) 0%, rgba(10,10,10,0) 70%);"></div>
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-neutral-100" data-aos="fade-down" data-aos-delay="200">Welcome to the Skybound Realms</h2>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-neutral-300" data-aos="fade-up" data-aos-delay="400">
+                Beneath drifting heavens, humanity survives aloft in colossal spires, navigating treacherous skies in majestic airships powered by luminous ether-crystals.
+            </p>
+            <a href="#world" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl red-glow-light transition duration-300 transform hover:scale-105" data-aos="zoom-in" data-aos-delay="600">
+                Explore the Spires
+            </a>
+        </section>
+
+        <section id="world" class="mb-16 scroll-mt-20" data-aos="fade-up">
+            <h2 class="text-3xl font-bold mb-6 text-red-500">A World Above the Mists</h2>
+            <p class="text-lg mb-4 text-neutral-300 leading-relaxed">
+                The surface world is lost, claimed by impenetrable mists hiding deadly predators and ancient secrets. Humanity dwells in colossal spires of stone and crystal piercing the clouds. Life revolves around majestic airships, navigating not just aerial perils but the equally treacherous landscapes of politics, commerce, and warfare among powerful Noble Houses, ambitious merchants, scholarly orders, and fearless protectors.
+            </p>
+            <p class="text-lg text-neutral-300 leading-relaxed">
+                Your destiny awaits aboard these airborne vessels, shaping the future across vast horizons.
+            </p>
+        </section>
+
+        <section id="attributes" class="mb-16 scroll-mt-20" data-aos="fade-up">
+             <h2 class="text-3xl font-bold mb-8 text-red-500">Core Attributes</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <div class="card p-6 rounded-lg" data-aos="fade-up" data-aos-delay="100"> <h3 class="text-xl font-semibold mb-2 text-red-400">Might</h3> <p class="text-neutral-400">Physical strength, force, grappling.</p> </div>
+                 <div class="card p-6 rounded-lg" data-aos="fade-up" data-aos-delay="150"> <h3 class="text-xl font-semibold mb-2 text-red-400">Endurance</h3> <p class="text-neutral-400">Stamina, resistance to pain, wound thresholds.</p> </div>
+                 <div class="card p-6 rounded-lg" data-aos="fade-up" data-aos-delay="200"> <h3 class="text-xl font-semibold mb-2 text-red-400">Agility</h3> <p class="text-neutral-400">Speed, balance, accuracy, dodging.</p> </div>
+                 <div class="card p-6 rounded-lg" data-aos="fade-up" data-aos-delay="250"> <h3 class="text-xl font-semibold mb-2 text-red-400">Intellect</h3> <p class="text-neutral-400">Logic, science, technical knowledge.</p> </div>
+                 <div class="card p-6 rounded-lg" data-aos="fade-up" data-aos-delay="300"> <h3 class="text-xl font-semibold mb-2 text-red-400">Willpower</h3> <p class="text-neutral-400">Focus, mental resilience, Etherialist stability.</p> </div>
+                 <div class="card p-6 rounded-lg" data-aos="fade-up" data-aos-delay="350"> <h3 class="text-xl font-semibold mb-2 text-red-400">Awareness</h3> <p class="text-neutral-400">Perception, spatial awareness, reaction timing.</p> </div>
+                 <div class="card p-6 rounded-lg md:col-span-2 lg:col-span-1" data-aos="fade-up" data-aos-delay="400"> <h3 class="text-xl font-semibold mb-2 text-red-400">Presence</h3> <p class="text-neutral-400">Charm, leadership, negotiation, social impact.</p> </div>
+             </div>
+              <p class="mt-6 text-neutral-400 italic" data-aos="fade-up">Attributes range from 1-10, influencing nearly all actions through modifiers. <span class="text-red-300">*Note: Modifier assumed to be Attribute - 5 for calculators.</span></p>
+         </section>
+
+        <section id="archetypes" class="mb-16 scroll-mt-20" data-aos="fade-up">
+             <h2 class="text-3xl font-bold mb-8 text-red-500">Starting Archetypes</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 <div class="card p-6 rounded-lg flex flex-col" data-aos="fade-up" data-aos-delay="100"> <h3 class="text-2xl font-semibold mb-3 text-red-400">Spirearch's Guard</h3> <p class="text-neutral-300 flex-grow">Formal, precise defenders...</p> <p class="mt-4 text-sm text-red-300 font-semibold">Req: Unarmed, Martial Acumen</p> </div>
+                 <div class="card p-6 rounded-lg flex flex-col" data-aos="fade-up" data-aos-delay="150"> <h3 class="text-2xl font-semibold mb-3 text-red-400">Fleet Marines</h3> <p class="text-neutral-300 flex-grow">Hardened airship enforcers...</p> <p class="mt-4 text-sm text-red-300 font-semibold">Req: Long Gun, Battle Composure</p> </div>
+                 <div class="card p-6 rounded-lg flex flex-col" data-aos="fade-up" data-aos-delay="200"> <h3 class="text-2xl font-semibold mb-3 text-red-400">Scholars</h3> <p class="text-neutral-300 flex-grow">Keepers of knowledge...</p> <p class="mt-4 text-sm text-red-300 font-semibold">Req: Engineering, Medicine</p> </div>
+                 <div class="card p-6 rounded-lg flex flex-col" data-aos="fade-up" data-aos-delay="250"> <h3 class="text-2xl font-semibold mb-3 text-red-400">Merchants</h3> <p class="text-neutral-300 flex-grow">Brokers of influence...</p> <p class="mt-4 text-sm text-red-300 font-semibold">Req: Negotiation, Business</p> </div>
+                 <div class="card p-6 rounded-lg flex flex-col" data-aos="fade-up" data-aos-delay="300"> <h3 class="text-2xl font-semibold mb-3 text-red-400">Aeronauts</h3> <p class="text-neutral-300 flex-grow">Living on the edge...</p> <p class="mt-4 text-sm text-red-300 font-semibold">Req: Aeronautics, Pistols</p> </div>
+             </div>
+         </section>
+
+        <section id="combat-calculator" class="mb-16 scroll-mt-20 card p-6 md:p-8 rounded-lg" data-aos="fade-up">
+            <h2 class="text-3xl font-bold mb-6 text-red-500">Character Combat Calculator</h2>
+            <p class="mb-6 text-neutral-400">Enter stats to simulate a combat roll (Attack: 2d6 + Skill + Attr Mod vs Defense: 8 + Agi Mod + Bonus).</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-red-400 border-b border-red-800 pb-2 mb-4">Attacker</h3>
+                    <div><label for="attacker-skill" class="calculator-label">Combat Skill (1-12)</label><input type="number" id="attacker-skill" class="calculator-input" min="0" max="12" value="5"></div>
+                    <div><label for="attacker-attribute" class="calculator-label">Relevant Attr (Might/Agi)</label><input type="number" id="attacker-attribute" class="calculator-input" min="1" max="10" value="6"></div>
+                    <div><label for="attacker-might" class="calculator-label">Attacker Might (for Dmg)</label><input type="number" id="attacker-might" class="calculator-input" min="1" max="10" value="6"></div>
+                    <div><label for="weapon-damage" class="calculator-label">Weapon Base Damage</label><input type="number" id="weapon-damage" class="calculator-input" min="0" value="4"></div>
+                    <div><label for="attacker-mods" class="calculator-label">Other Mods (+/-)</label><input type="number" id="attacker-mods" class="calculator-input" value="0"></div>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-red-400 border-b border-red-800 pb-2 mb-4">Defender</h3>
+                    <div><label for="defender-agility" class="calculator-label">Defender Agility</label><input type="number" id="defender-agility" class="calculator-input" min="1" max="10" value="5"></div>
+                    <div><label for="defender-bonus" class="calculator-label">Armor/Cover Bonus</label><input type="number" id="defender-bonus" class="calculator-input" min="0" value="1"></div>
+                    <div><label for="defender-soak" class="calculator-label">Armor Soak</label><input type="number" id="defender-soak" class="calculator-input" min="0" value="2"></div>
+                </div>
+            </div>
+            <div class="mt-8 text-center"><button id="calculate-char-button" class="calculator-button">Calculate Character Roll</button></div>
+            <div id="char-results-area" class="result-box mt-8 space-y-2 text-neutral-300"><p>Character combat results will appear here...</p></div>
+        </section>
+
+        <section id="airship-combat-calculator" class="mb-16 scroll-mt-20 card p-6 md:p-8 rounded-lg" data-aos="fade-up">
+            <h2 class="text-3xl font-bold mb-6 text-red-500">Airship Combat Calculator</h2>
+             <div class="disclaimer mb-6">
+                Note: The specific rules for airship combat are not detailed in the provided draft. This calculator uses a plausible interpretation based on character combat rules and ship components mentioned. Treat results as estimates.
+            </div>
+            <p class="mb-6 text-neutral-400">Enter ship/crew stats to simulate an airship combat roll (Estimated Mechanics).</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-red-400 border-b border-red-800 pb-2 mb-4">Attacking Ship</h3>
+                    <div><label for="ship-gunnery" class="calculator-label">Gunnery Skill / Bonus</label><input type="number" id="ship-gunnery" class="calculator-input" min="0" value="4"></div>
+                    <div><label for="ship-officer-mod" class="calculator-label">Officer Modifier (e.g., Gunner Agi Mod)</label><input type="number" id="ship-officer-mod" class="calculator-input" value="1"></div>
+                    <div><label for="ship-attack-bonus" class="calculator-label">Ship System Attack Bonus (Targeting)</label><input type="number" id="ship-attack-bonus" class="calculator-input" min="0" value="1"></div>
+                    <div><label for="ship-cannon-damage" class="calculator-label">Cannon Base Damage</label><input type="number" id="ship-cannon-damage" class="calculator-input" min="0" value="10"></div>
+                     <div><label for="ship-power-bonus" class="calculator-label">Power Crystal Damage Bonus</label><input type="number" id="ship-power-bonus" class="calculator-input" min="0" value="2"></div>
+                     <div><label for="ship-attack-mods" class="calculator-label">Other Attack Mods (+/-)</label><input type="number" id="ship-attack-mods" class="calculator-input" value="0"></div>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-red-400 border-b border-red-800 pb-2 mb-4">Defending Ship</h3>
+                    <div><label for="ship-pilot-mod" class="calculator-label">Pilot Modifier (e.g., Pilot Agi Mod)</label><input type="number" id="ship-pilot-mod" class="calculator-input" value="1"></div>
+                    <div><label for="ship-defense-bonus" class="calculator-label">Ship System Defense Bonus (Evasion)</label><input type="number" id="ship-defense-bonus" class="calculator-input" min="0" value="1"></div>
+                    <div><label for="ship-armor" class="calculator-label">Ship Armor / Shield Value</label><input type="number" id="ship-armor" class="calculator-input" min="0" value="5"></div>
+                     <div><label for="ship-cover-bonus" class="calculator-label">Cover Bonus (Clouds, etc.)</label><input type="number" id="ship-cover-bonus" class="calculator-input" min="0" value="0"></div>
+                </div>
+            </div>
+            <div class="mt-8 text-center"><button id="calculate-ship-button" class="calculator-button">Calculate Airship Roll</button></div>
+            <div id="ship-results-area" class="result-box mt-8 space-y-2 text-neutral-300"><p>Airship combat results will appear here...</p></div>
+        </section>
+
+    </main>
+
+    <footer class="bg-neutral-900 py-6 mt-16 border-t border-neutral-700">
+        <div class="container mx-auto px-6 text-center text-neutral-500 text-sm">
+            &copy; 2025 The Cinder Spires RPG. Content based on Draft 1.2. All rights reserved (conceptually).
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({
+            once: true, // Animation happens only once per element
+            duration: 600, // Animation duration in milliseconds
+            easing: 'ease-in-out', // Animation timing function
+        });
+    </script>
+
+    <script>
+        // Wait for the DOM to be fully loaded before running scripts
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Helper Functions ---
+
+            /**
+             * Calculates the attribute modifier based on the attribute score.
+             * ASSUMPTION: Modifier = Attribute Score - 5. This is noted elsewhere.
+             * @param {number|string} attributeValue - The attribute score.
+             * @returns {number} The calculated modifier.
+             */
+            function getAttributeModifier(attributeValue) {
+                const value = parseInt(attributeValue, 10);
+                return isNaN(value) ? 0 : value - 5;
+            }
+
+            /**
+             * Simulates rolling 2 six-sided dice (2d6).
+             * @returns {{total: number, rolls: number[]}} An object containing the total and individual rolls.
+             */
+            function roll2d6() {
+                const die1 = Math.floor(Math.random() * 6) + 1;
+                const die2 = Math.floor(Math.random() * 6) + 1;
+                return { total: die1 + die2, rolls: [die1, die2] };
+            }
+
+            // --- Character Combat Calculator Logic ---
+            const charCalcButton = document.getElementById('calculate-char-button');
+            const charResultsArea = document.getElementById('char-results-area');
+
+            // Add event listener if the button exists
+            if (charCalcButton) {
+                charCalcButton.addEventListener('click', () => {
+                    // Read Input Values, providing default 0 if parsing fails
+                    const attackerSkill = parseInt(document.getElementById('attacker-skill').value, 10) || 0;
+                    const attackerAttribute = parseInt(document.getElementById('attacker-attribute').value, 10) || 0;
+                    const attackerMight = parseInt(document.getElementById('attacker-might').value, 10) || 0;
+                    const weaponDamage = parseInt(document.getElementById('weapon-damage').value, 10) || 0;
+                    const attackerMods = parseInt(document.getElementById('attacker-mods').value, 10) || 0;
+                    const defenderAgility = parseInt(document.getElementById('defender-agility').value, 10) || 0;
+                    const defenderBonus = parseInt(document.getElementById('defender-bonus').value, 10) || 0;
+                    const defenderSoak = parseInt(document.getElementById('defender-soak').value, 10) || 0;
+
+                    // Perform Calculations
+                    const attackerAttrMod = getAttributeModifier(attackerAttribute);
+                    const attackerMightMod = getAttributeModifier(attackerMight);
+                    const defenderAgiMod = getAttributeModifier(defenderAgility);
+                    const diceRoll = roll2d6(); // Roll the dice
+                    // Attack Check = 2d6 + Skill + Attribute Modifier + Other Modifiers
+                    const attackTotal = diceRoll.total + attackerSkill + attackerAttrMod + attackerMods;
+                    // Defense Target Number (TN) = Base 8 + Agility Modifier + Armor/Cover Bonus
+                    const defenseTN = 8 + defenderAgiMod + defenderBonus;
+                    const hit = attackTotal >= defenseTN; // Check if attack hits
+                    // Damage = Weapon Damage + Might Modifier - Armor Soak (minimum 0)
+                    const damageDealt = hit ? Math.max(0, weaponDamage + attackerMightMod - defenderSoak) : 0;
+                    const resultText = hit ? `<span class="text-green-400 font-bold">HIT!</span>` : `<span class="text-yellow-400 font-bold">MISS!</span>`;
+
+                    // Display Results in the designated area
+                    charResultsArea.innerHTML = `
+                        <p><strong>Dice Roll (2d6):</strong> ${diceRoll.total} (${diceRoll.rolls.join(' + ')})</p>
+                        <p><strong>Attacker's Check:</strong> ${diceRoll.total} + ${attackerSkill} (Skill) + ${attackerAttrMod} (Attr Mod) + ${attackerMods} (Other) = <strong>${attackTotal}</strong></p>
+                        <p><strong>Defender's Defense TN:</strong> 8 + ${defenderAgiMod} (Agi Mod) + ${defenderBonus} (Bonus) = <strong>${defenseTN}</strong></p>
+                        <hr class="border-neutral-700 my-2">
+                        <p><strong>Result:</strong> ${resultText}</p>
+                        ${hit ? `<p><strong>Damage Calculation:</strong> ${weaponDamage} (Wpn) + ${attackerMightMod} (Might Mod) - ${defenderSoak} (Soak) = <strong class="text-xl text-red-500">${damageDealt} Damage</strong></p>` : ''}
+                        <p class="text-xs text-neutral-500 mt-2">*Attribute Modifier assumed as Attribute Score - 5.</p>
+                    `;
+                });
+            }
+
+            // --- Airship Combat Calculator Logic ---
+            const shipCalcButton = document.getElementById('calculate-ship-button');
+            const shipResultsArea = document.getElementById('ship-results-area');
+
+            // Add event listener if the button exists
+             if (shipCalcButton) {
+                shipCalcButton.addEventListener('click', () => {
+                    // Read Input Values, providing default 0 if parsing fails
+                    const gunnerySkill = parseInt(document.getElementById('ship-gunnery').value, 10) || 0;
+                    const officerMod = parseInt(document.getElementById('ship-officer-mod').value, 10) || 0; // Using direct modifier input
+                    const attackBonus = parseInt(document.getElementById('ship-attack-bonus').value, 10) || 0;
+                    const cannonDamage = parseInt(document.getElementById('ship-cannon-damage').value, 10) || 0;
+                    const powerBonus = parseInt(document.getElementById('ship-power-bonus').value, 10) || 0;
+                    const attackMods = parseInt(document.getElementById('ship-attack-mods').value, 10) || 0;
+
+                    const pilotMod = parseInt(document.getElementById('ship-pilot-mod').value, 10) || 0; // Using direct modifier input
+                    const defenseBonus = parseInt(document.getElementById('ship-defense-bonus').value, 10) || 0;
+                    const armor = parseInt(document.getElementById('ship-armor').value, 10) || 0;
+                    const coverBonus = parseInt(document.getElementById('ship-cover-bonus').value, 10) || 0;
+
+                    // Perform Calculations (Based on Plausible Interpretation)
+                    const diceRoll = roll2d6(); // Roll the dice
+                    // Attack Check = 2d6 + Gunnery Skill + Officer Modifier + System Bonus + Other Mods
+                    const attackTotal = diceRoll.total + gunnerySkill + officerMod + attackBonus + attackMods;
+                    // Defense TN = Base 8 + Pilot Modifier + System Bonus + Cover Bonus (Assuming base 8)
+                    const defenseTN = 8 + pilotMod + defenseBonus + coverBonus;
+                    const hit = attackTotal >= defenseTN; // Check if attack hits
+                    // Damage = Cannon Damage + Power Bonus - Armor (minimum 0)
+                    const damageDealt = hit ? Math.max(0, cannonDamage + powerBonus - armor) : 0;
+                    const resultText = hit ? `<span class="text-green-400 font-bold">HIT!</span>` : `<span class="text-yellow-400 font-bold">MISS!</span>`;
+
+                    // Display Results in the designated area
+                    shipResultsArea.innerHTML = `
+                        <p><strong>Dice Roll (2d6):</strong> ${diceRoll.total} (${diceRoll.rolls.join(' + ')})</p>
+                        <p><strong>Attacking Ship Check:</strong> ${diceRoll.total} + ${gunnerySkill} (Gun) + ${officerMod} (Off) + ${attackBonus} (Sys) + ${attackMods} (Oth) = <strong>${attackTotal}</strong></p>
+                        <p><strong>Defending Ship TN:</strong> 8 (Base) + ${pilotMod} (Pilot) + ${defenseBonus} (Sys) + ${coverBonus} (Cov) = <strong>${defenseTN}</strong></p>
+                        <hr class="border-neutral-700 my-2">
+                        <p><strong>Result:</strong> ${resultText}</p>
+                        ${hit ? `<p><strong>Damage Calculation:</strong> ${cannonDamage} (Cannon) + ${powerBonus} (Power) - ${armor} (Armor) = <strong class="text-xl text-red-500">${damageDealt} Damage</strong></p>` : ''}
+                        <p class="text-xs text-neutral-500 mt-2">*Mechanics estimated based on available info.</p>
+                    `;
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
